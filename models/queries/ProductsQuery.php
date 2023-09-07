@@ -16,6 +16,7 @@ class ProductsQuery extends \yii\db\ActiveQuery
 
     /**
      * {@inheritdoc}
+     *
      * @return \app\models\Products[]|array
      */
     public function all($db = null)
@@ -25,6 +26,7 @@ class ProductsQuery extends \yii\db\ActiveQuery
 
     /**
      * {@inheritdoc}
+     *
      * @return \app\models\Products|array|null
      */
     public function one($db = null)

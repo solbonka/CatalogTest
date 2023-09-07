@@ -3,7 +3,7 @@
   "description": "Yii 2 Basic Project Template",
   "keywords": ["yii2", "framework", "basic", "project template"],
   "homepage": "https://www.yiiframework.com/",
-  "type": "project",
+  "type": "phpcodesniffer-standard",
   "license": "BSD-3-Clause",
   "support": {
     "issues": "https://github.com/yiisoft/yii2/issues?state=open",
@@ -31,11 +31,15 @@
     "codeception/module-filesystem": "^3.0 || ^2.0 || ^1.1",
     "codeception/verify": "^3.0 || ^2.2",
     "symfony/browser-kit": "^6.0 || >=2.7 <=4.2.4",
-    "insolita/yii2-migration-generator": "~3.1"
+    "insolita/yii2-migration-generator": "~3.1",
+    "friendsofphp/php-cs-fixer": "^3.25",
+    "dealerdirect/phpcodesniffer-composer-installer": "v0.7.2",
+    "bitpressio/phpcs": "^0.2.0"
   },
   "config": {
     "allow-plugins": {
-      "yiisoft/yii2-composer" : true
+      "yiisoft/yii2-composer": true,
+      "dealerdirect/phpcodesniffer-composer-installer": true
     },
     "process-timeout": 1800,
     "fxp-asset": {
@@ -52,7 +56,8 @@
     "post-create-project-cmd": [
       "yii\\composer\\Installer::postCreateProject",
       "yii\\composer\\Installer::postInstall"
-    ]
+    ],
+    "post-package-install": "vendor/bin/phpcs --config-set default_standard Bitpress"
   },
   "extra": {
     "yii\\composer\\Installer::postCreateProject": {

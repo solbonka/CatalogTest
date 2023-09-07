@@ -16,6 +16,7 @@ class CategoriesQuery extends \yii\db\ActiveQuery
 
     /**
      * {@inheritdoc}
+     *
      * @return \app\models\Categories[]|array
      */
     public function all($db = null)
@@ -25,6 +26,7 @@ class CategoriesQuery extends \yii\db\ActiveQuery
 
     /**
      * {@inheritdoc}
+     *
      * @return \app\models\Categories|array|null
      */
     public function one($db = null)

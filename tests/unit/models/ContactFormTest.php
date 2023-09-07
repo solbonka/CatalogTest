@@ -3,12 +3,13 @@
 namespace tests\unit\models;
 
 use app\models\forms\AdminPanelForm;
+use UnitTester;
 use yii\mail\MessageInterface;
 
 class ContactFormTest extends \Codeception\Test\Unit
 {
     /**
-     * @var \UnitTester
+     * @var UnitTester
      */
     public $tester;
 

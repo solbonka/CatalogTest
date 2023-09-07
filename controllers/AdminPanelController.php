@@ -8,18 +8,17 @@ use app\models\ProductProperties;
 use app\models\Products;
 use app\models\Properties;
 use app\models\PropertyValues;
+use Exception;
 use Throwable;
 use Yii;
 use yii\web\Controller;
-use yii\web\Response;
 
 class AdminPanelController extends Controller
 {
-
     /**
      * Panel action.
      *
-     * @return Response|string
+     * @return string
      */
     public function actionPanel()
     {
@@ -34,7 +33,7 @@ class AdminPanelController extends Controller
      * @return string
      * @throws Throwable
      */
-    public function actionUpdate()
+    public function actionUpdate(): string
     {
         $model = new AdminPanelForm();
         $name = Yii::$app->request->post('AdminPanelForm')['name'];
@@ -69,7 +68,9 @@ class AdminPanelController extends Controller
                     }
                     $propertyId = $property->id;
 
-                    $propertyValue = PropertyValues::findOne(['value' => $valueNames[$index], 'property_id' => $propertyId]);
+                    $propertyValue = PropertyValues::findOne([
+                        'value' => $valueNames[$index],
+                        'property_id' => $propertyId]);
                     if (!$propertyValue) {
                         $propertyValue = new PropertyValues();
                         $propertyValue->value = $valueNames[$index];
@@ -78,7 +79,13 @@ class AdminPanelController extends Controller
                     }
                     $valueId = $propertyValue->id;
 
-                    $existingProductProperty = ProductProperties::findOne(['product_id' => $productId, 'property_id' => $propertyId, 'value_id' => $valueId]);
+                    $existingProductProperty = ProductProperties::findOne(
+                        [
+                            'product_id' => $productId,
+                            'property_id' => $propertyId,
+                            'value_id' => $valueId,
+                        ]
+                    );
                     if (!$existingProductProperty) {
                         $productProperty = new ProductProperties();
                         $productProperty->product_id = $productId;
@@ -121,14 +128,22 @@ class AdminPanelController extends Controller
             $transaction->commit();
             Yii::$app->session->setFlash('success', 'Товар добавлен или обновлен успешно.');
 
-            return $this->render('update', ['success' => 'Товар успешно добавлен или обновлен', 'model' => $model]); // Перенаправлять на нужную страницу после успешного добавления или обновления продукта
-
-        } catch (\Exception $e) {
+            return $this->render(
+                'update',
+                ['success' => 'Товар успешно добавлен или обновлен', 'model' => $model]
+            );
+        } catch (Exception $e) {
             $transaction->rollBack();
 
-            Yii::$app->session->setFlash('error', 'Произошла ошибка при добавлении или обновлении товара: ' . $e->getMessage());
+            Yii::$app->session->setFlash(
+                'error',
+                'Произошла ошибка при добавлении или обновлении товара: ' . $e->getMessage()
+            );
 
-            return $this->render('update', ['false' => 'Не удалось добавить или обновить товар', 'model' => $model]); // Перенаправлять на нужную страницу после ошибки
+            return $this->render(
+                'update',
+                ['false' => 'Не удалось добавить или обновить товар', 'model' => $model]
+            );
         }
     }
 }

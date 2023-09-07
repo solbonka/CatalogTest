@@ -2,17 +2,14 @@
 
 namespace app\models;
 
-use Yii;
-
 /**
  * This is the model class for table "products".
  *
- * @property int $id
- * @property string $name
- * @property int $price
- * @property int|null $category_id
- *
- * @property Categories $category
+ * @property int                 $id
+ * @property string              $name
+ * @property int                 $price
+ * @property int|null            $category_id
+ * @property Categories          $category
  * @property ProductProperties[] $productProperties
  */
 class Products extends \yii\db\ActiveRecord

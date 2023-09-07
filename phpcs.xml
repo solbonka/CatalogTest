@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<!-- @see https://pear.php.net/manual/en/package.php.php-codesniffer.annotated-ruleset.php -->
+<ruleset name="My App">
+    <file>controllers</file>
+
+    <rule ref="Bitpress"></rule>
+</ruleset>

@@ -2,15 +2,12 @@
 
 namespace app\models;
 
-use Yii;
-
 /**
  * This is the model class for table "categories".
  *
- * @property int $id
- * @property string $name
- *
- * @property Products[] $products
+ * @property int          $id
+ * @property string       $name
+ * @property Products[]   $products
  * @property Properties[] $properties
  */
 class Categories extends \yii\db\ActiveRecord

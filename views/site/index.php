@@ -1,11 +1,11 @@
 <?php
 
 /** @var yii\web\View $this */
-
 $this->title = 'My Yii Application';
-/** @var array $categories */
-/** @var array $products */
-/** @var array $properties */
+/* @var array $categories */
+/* @var array $products */
+/* @var array $properties */
+/* @var array $productProperties */
 ?>
 <div class="site-index">
     <div class="container">
@@ -14,13 +14,13 @@ $this->title = 'My Yii Application';
             <h2>Фильтры</h2>
 
             <form action="/site/catalog" method="POST" id="filter-form">
-                <input type="hidden" name="<?= Yii::$app->request->csrfParam ?>" value="<?= Yii::$app->request->csrfToken ?>">
+                <input type="hidden" name="<?php echo Yii::$app->request->csrfParam; ?>" value="<?php echo Yii::$app->request->csrfToken; ?>">
                 <label for="category">Категория:</label>
                 <select name="category" id="category">
                     <option value="">Все категории</option>
-                    <?php foreach ($categories as $category): ?>
-                    <option value="<?= $category['id'] ?>"><?= $category['name'] ?></option>
-                    <?php endforeach; ?>
+                    <?php foreach ($categories as $category) { ?>
+                    <option value="<?php echo $category['id']; ?>"><?php echo $category['name']; ?></option>
+                    <?php } ?>
                 </select>
                 <div class="properties">
 
@@ -29,14 +29,29 @@ $this->title = 'My Yii Application';
             </form>
         </div>
         <div class="product-grid">
-            <?php
-            foreach ($products as $product): ?>
-                <div class="product-item category<?= $product->category['id'] ?>">
-                    <h3><?= $product['name'] ?></h3>
-                    <p class="price"><?= $product['price'] ?> руб.</p>
-                    <p class="category<?= $product->category['id'] ?>">Категория: <?= $product->category['name'] ?></p>
+            <?php foreach ($products as $product) { ?>
+                <div class="product-item category<?php echo $product->category['id']; ?>">
+                    <h3><?php echo $product['name']; ?></h3>
+                    <p class="price"><?php echo $product['price']; ?> руб.</p>
+                    <p class="category<?php echo $product->category['id']; ?>">Категория: <?php echo $product->category['name']; ?></p>
+                    <?php
+                    $groupedProperties = [];
+                    foreach ($product->productProperties as $productProperty) {
+                        $groupName = $productProperty->property['name'];
+                        if (!isset($groupedProperties[$groupName])) {
+                            $groupedProperties[$groupName] = [];
+                        }
+                        $groupedProperties[$groupName][] = $productProperty->value['value'];
+                    }
+                    ?>
+                    <?php foreach ($groupedProperties as $groupName => $groupedValues) { ?>
+                        <p class="property<?php echo $productProperty->property['id']; ?>">
+                            <?php echo $groupName; ?>:
+                            <?php echo implode(', ', $groupedValues); ?>
+                        </p>
+                    <?php } ?>
                 </div>
-            <?php endforeach; ?>
+            <?php } ?>
         </div>
     </div>
 </div>
@@ -69,7 +84,7 @@ $this->title = 'My Yii Application';
         font-weight: bold;
     }
 
-    .category<?= $product->category['id'] ?>{
+    .category<?php echo $product->category['id']; ?>{
         font-style: italic;
     }
 </style>
@@ -84,7 +99,9 @@ $this->title = 'My Yii Application';
             $.ajax({
                 url: '/site/catalog',
                 type: 'POST',
-                header: '&csrf=' + $('meta[name="csrf-token"]').attr('content'),
+                headers: {
+                    '<?= Yii::$app->request->csrfParam; ?>': '<?= Yii::$app->request->csrfToken; ?>'
+                },
                 data: formData,
                 success: function(response) {
 

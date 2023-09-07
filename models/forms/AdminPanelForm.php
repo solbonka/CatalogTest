@@ -15,9 +15,8 @@ class AdminPanelForm extends Model
     public $property = [];
     public $value = [];
 
-
     /**
-     * @return array the validation rules.
+     * @return array the validation rules
      */
     public function rules()
     {

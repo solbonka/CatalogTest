@@ -68,7 +68,11 @@ class SiteController extends Controller
         $categories = Categories::find()->all();
         $products = Products::find()->all();
         $properties = Properties::find()->all();
-        return $this->render('index', compact('categories', 'products', 'properties'));
+
+        return $this->render(
+            'index',
+            compact('categories', 'products', 'properties')
+        );
     }
 
     /**
@@ -84,10 +88,13 @@ class SiteController extends Controller
         $categoryId = Yii::$app->request->post('category');
         if (count(Yii::$app->request->post()) > 2) {
             $currentPropertyValueIds = array_slice(Yii::$app->request->post(), 2);
-            $isCurrentPropertyValueIds = array_filter($currentPropertyValueIds, function($value) {
+            $isCurrentPropertyValueIds = array_filter($currentPropertyValueIds, function ($value) {
                 return !empty($value);
             });
-            if ((empty($currentPropertyValueIds[array_key_first($currentPropertyValueIds)]) && count($currentPropertyValueIds) === 1) || empty($isCurrentPropertyValueIds)){
+            if (
+                (empty($currentPropertyValueIds[array_key_first($currentPropertyValueIds)])
+                    && count($currentPropertyValueIds) === 1) || empty($isCurrentPropertyValueIds)
+            ) {
                 $products = Products::find()
                     ->andFilterWhere(['category_id' => $categoryId])
                     ->all();
@@ -95,18 +102,27 @@ class SiteController extends Controller
                 return $this->renderAjax('_products', ['products' => $products]);
             }
 
-            foreach ($currentPropertyValueIds as $currentPropertyValueId){
+            foreach ($currentPropertyValueIds as $currentPropertyValueId) {
                 $currentPropertyValuesArray[] = PropertyValues::find()->where(['id' => $currentPropertyValueId])->all();
             }
 
-            $currentPropertyValuesArray = array_filter($currentPropertyValuesArray, function($element) {
+            $currentPropertyValuesArray = array_filter($currentPropertyValuesArray, function ($element) {
                 return !empty($element);
             });
 
-            foreach ($currentPropertyValuesArray as $currentPropertyValues){
-                foreach ($currentPropertyValues as $currentPropertyValue){
-                    if (!in_array(ProductProperties::find()->andFilterWhere(['property_id' => $currentPropertyValue->property->id, 'value_id' => $currentPropertyValue->id])->all(), $currentProductPropertiesArray)) {
-                        $currentProductPropertiesArray[] = ProductProperties::find()->andFilterWhere(['property_id' => $currentPropertyValue->property->id, 'value_id' => $currentPropertyValue->id])->all();
+            foreach ($currentPropertyValuesArray as $currentPropertyValues) {
+                foreach ($currentPropertyValues as $currentPropertyValue) {
+                    if (
+                        !in_array(
+                            ProductProperties::find()->andFilterWhere([
+                            'property_id' => $currentPropertyValue->property->id,
+                            'value_id' => $currentPropertyValue->id])->all(),
+                            $currentProductPropertiesArray
+                        )
+                    ) {
+                        $currentProductPropertiesArray[] = ProductProperties::find()->andFilterWhere([
+                            'property_id' => $currentPropertyValue->property->id,
+                            'value_id' => $currentPropertyValue->id])->all();
                     }
                 }
             }
@@ -126,15 +142,15 @@ class SiteController extends Controller
         }
         $properties = Properties::find()->where(['category_id' => $categoryId])->all();
         if (!empty($categoryId)) {
-                $products = Products::find()
-                    ->andFilterWhere(['category_id' => $categoryId])
-                    ->all();
+            $products = Products::find()
+                ->andFilterWhere(['category_id' => $categoryId])
+                ->all();
         } else {
             $products = Products::find()->all();
         }
 
-        return $this->asJson(['products' =>  $this->renderAjax('_products', ['products' => $products]),
-            'properties' =>  $this->renderAjax('_properties', ['properties' => $properties])]);
+        return $this->asJson(['products' => $this->renderAjax('_products', ['products' => $products]),
+            'properties' => $this->renderAjax('_properties', ['properties' => $properties])]);
     }
 
     /**
@@ -155,6 +171,7 @@ class SiteController extends Controller
 
         return $this->renderAjax('_products', ['products' => $products]);
     }
+
     /**
      * Login action.
      *
@@ -172,6 +189,7 @@ class SiteController extends Controller
         }
 
         $model->password = '';
+
         return $this->render('login', [
             'model' => $model,
         ]);
@@ -188,7 +206,6 @@ class SiteController extends Controller
 
         return $this->goHome();
     }
-
 
     /**
      * Displays about page.

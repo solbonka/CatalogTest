@@ -1,14 +1,15 @@
-<?php if(isset($properties)):
-    foreach ($properties as $property): ?>
-        <label for="property_<?= $property['id'] ?>"><?= $property['name'] ?>:</label>
-        <select name="property_<?= $property['id'] ?>" id="property_<?= $property['id'] ?>">
+<?php if (isset($properties)) {
+    foreach ($properties as $property) { ?>
+        <label for="property_<?php echo $property['id']; ?>"><?php echo $property['name']; ?>:</label>
+        <select name="property_<?php echo $property['id']; ?>" id="property_<?php echo $property['id']; ?>">
             <option value="">Все</option>
-            <?php foreach ($property->propertyValues as $value): ?>
-                <option value="<?= $value['id'] ?>"><?= $value['value'] ?></option>
-            <?php endforeach; ?>
+            <?php foreach ($property->propertyValues as $value) { ?>
+                <option value="<?php echo $value['id']; ?>"><?php echo $value['value']; ?></option>
+            <?php } ?>
         </select>
-    <?php endforeach; else: ?>
-<?php endif;?>
+    <?php }
+    } else { ?>
+<?php }?>
 <script>
     $('select[name^="property_"]').on('change', function(e) {
         e.preventDefault();

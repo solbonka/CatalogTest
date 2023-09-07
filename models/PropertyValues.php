@@ -2,17 +2,14 @@
 
 namespace app\models;
 
-use Yii;
-
 /**
  * This is the model class for table "property_values".
  *
- * @property int $id
- * @property string $value
- * @property int|null $property_id
- *
+ * @property int                 $id
+ * @property string              $value
+ * @property int|null            $property_id
  * @property ProductProperties[] $productProperties
- * @property Properties $property
+ * @property Properties          $property
  */
 class PropertyValues extends \yii\db\ActiveRecord
 {

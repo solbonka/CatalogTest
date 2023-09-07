@@ -16,6 +16,7 @@ class PropertyValuesQuery extends \yii\db\ActiveQuery
 
     /**
      * {@inheritdoc}
+     *
      * @return \app\models\PropertyValues[]|array
      */
     public function all($db = null)
@@ -25,6 +26,7 @@ class PropertyValuesQuery extends \yii\db\ActiveQuery
 
     /**
      * {@inheritdoc}
+     *
      * @return \app\models\PropertyValues|array|null
      */
     public function one($db = null)

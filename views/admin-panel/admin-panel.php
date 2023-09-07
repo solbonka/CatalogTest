@@ -7,20 +7,20 @@
 
         <?php $form = \yii\widgets\ActiveForm::begin(['action' => '/admin-panel/update', 'method' => 'POST']); ?>
 
-        <?= $form->errorSummary($model); ?>
+        <?php echo $form->errorSummary($model); ?>
 
-        <?= $form->field($model, 'name')->textInput(['id' => 'product_name'])->label('Название продукта:') ?>
+        <?php echo $form->field($model, 'name')->textInput(['id' => 'product_name'])->label('Название продукта:'); ?>
 
-        <?= $form->field($model, 'price')->textInput(['id' => 'price'])->label('Цена:') ?>
+        <?php echo $form->field($model, 'price')->textInput(['id' => 'price'])->label('Цена:'); ?>
 
-        <?= $form->field($model, 'category')->textInput(['id' => 'category'])->label('Категория:') ?>
+        <?php echo $form->field($model, 'category')->textInput(['id' => 'category'])->label('Категория:'); ?>
 
         <div id="properties-container">
         </div>
 
         <button type="button" onclick="addProperty()">Добавить свойство</button>
 
-        <?= \yii\helpers\Html::submitButton('Сохранить', ['id' => 'my-btn']) ?>
+        <?php echo \yii\helpers\Html::submitButton('Сохранить', ['id' => 'my-btn']); ?>
 
         <?php \yii\widgets\ActiveForm::end(); ?>
     </div>
@@ -126,6 +126,6 @@ $js = <<<JS
         });
     });
 JS;
-$this->registerJs($js);
-?>
+        $this->registerJs($js);
+        ?>
 
