@@ -8,7 +8,7 @@ namespace app\models;
  * @property int          $id
  * @property string       $name
  * @property Products[]   $products
- * @property Properties[] $properties
+ * @property ProductProperties[] $productProperties
  */
 class Categories extends \yii\db\ActiveRecord
 {
@@ -58,8 +58,8 @@ class Categories extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getProperties()
+    public function getProductProperties()
     {
-        return $this->hasMany(Properties::class, ['category_id' => 'id']);
+        return $this->hasMany(ProductProperties::class, ['category_id' => 'id']);
     }
 }

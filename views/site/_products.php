@@ -1,6 +1,7 @@
-<?php if ($products) {
+<?php /** @var array $products */
+if ($products) {
     foreach ($products as $product) { ?>
-        <div class="product-item category<?php echo $product->category['id']; ?>">
+        <div class="product-item product<?php echo $product->id; ?> ">
             <h3><?php echo $product['name']; ?></h3>
             <p class="price"><?php echo $product['price']; ?> руб.</p>
             <p class="category<?php echo $product->category['id']; ?>">Категория: <?php echo $product->category['name']; ?></p>

@@ -7,8 +7,6 @@ namespace app\models;
  *
  * @property int                 $id
  * @property string              $name
- * @property int|null            $category_id
- * @property Categories          $category
  * @property ProductProperties[] $productProperties
  * @property PropertyValues[]    $propertyValues
  */
@@ -29,9 +27,7 @@ class Properties extends \yii\db\ActiveRecord
     {
         return [
             [['name'], 'required'],
-            [['category_id'], 'integer'],
             [['name'], 'string', 'max' => 255],
-            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Categories::class, 'targetAttribute' => ['category_id' => 'id']],
         ];
     }
 
@@ -43,18 +39,7 @@ class Properties extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'name' => 'Name',
-            'category_id' => 'Category ID',
         ];
-    }
-
-    /**
-     * Gets query for [[Category]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCategory()
-    {
-        return $this->hasOne(Categories::class, ['id' => 'category_id']);
     }
 
     /**

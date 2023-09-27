@@ -19,7 +19,7 @@ $this->title = 'My Yii Application';
                 <select name="category" id="category">
                     <option value="">Все категории</option>
                     <?php foreach ($categories as $category) { ?>
-                    <option value="<?php echo $category['id']; ?>"><?php echo $category['name']; ?></option>
+                        <option value="<?php echo $category['id']; ?>"><?php echo $category['name']; ?></option>
                     <?php } ?>
                 </select>
                 <div class="properties">
@@ -30,7 +30,7 @@ $this->title = 'My Yii Application';
         </div>
         <div class="product-grid">
             <?php foreach ($products as $product) { ?>
-                <div class="product-item category<?php echo $product->category['id']; ?>">
+                <div class="product-item product<?php echo $product->id; ?>">
                     <h3><?php echo $product['name']; ?></h3>
                     <p class="price"><?php echo $product['price']; ?> руб.</p>
                     <p class="category<?php echo $product->category['id']; ?>">Категория: <?php echo $product->category['name']; ?></p>
@@ -83,10 +83,6 @@ $this->title = 'My Yii Application';
     .price {
         font-weight: bold;
     }
-
-    .category<?php echo $product->category['id']; ?>{
-        font-style: italic;
-    }
 </style>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
@@ -104,13 +100,11 @@ $this->title = 'My Yii Application';
                 },
                 data: formData,
                 success: function(response) {
-
+                    console.log(response);
                     $('.product-grid').html(response['products']);
                     $('.properties').html(response['properties']);
                 }
             });
         });
     });
-
 </script>
-

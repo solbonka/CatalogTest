@@ -23,78 +23,52 @@ class AdminPanelController extends Controller
     public function actionPanel()
     {
         $model = new AdminPanelForm();
-
         return $this->render('admin-panel', ['model' => $model]);
     }
 
     /**
-     * Update action.
+     * Product action.
      *
      * @return string
      * @throws Throwable
      */
-    public function actionUpdate(): string
+    public function actionProducts()
+    {
+        $products = Products::find()->all();
+        return $this->renderAjax('products', ['products' => $products]);
+    }
+
+    /**
+     * Save action.
+     *
+     * @return string
+     */
+    public function actionSave(): string
     {
         $model = new AdminPanelForm();
+
         $name = Yii::$app->request->post('AdminPanelForm')['name'];
         $price = Yii::$app->request->post('AdminPanelForm')['price'];
         $categoryName = Yii::$app->request->post('AdminPanelForm')['category'];
         $propertyNames = Yii::$app->request->post('property');
         $valueNames = Yii::$app->request->post('value');
-
-        $transaction = Yii::$app->db->beginTransaction();
-        try {
-            $category = new Categories();
-            $category->name = $categoryName;
-
-            if (Categories::findOne(['name' => $categoryName])) {
-                $category->update();
-            } else {
-                $category->save();
-            }
-            $categoryId = Categories::findOne(['name' => $categoryName])->id;
-
-            $existingProduct = Products::findOne(['name' => $name, 'price' => $price, 'category_id' => $categoryId]);
-            if ($existingProduct) {
-                $productId = $existingProduct->id;
-                // Добавляем свойства и значения продукта
-                foreach ($propertyNames as $index => $propertyName) {
-                    $property = Properties::findOne(['name' => $propertyName, 'category_id' => $categoryId]);
-                    if (!$property) {
-                        $property = new Properties();
-                        $property->name = $propertyName;
-                        $property->category_id = $categoryId;
-                        $property->save();
-                    }
-                    $propertyId = $property->id;
-
-                    $propertyValue = PropertyValues::findOne([
-                        'value' => $valueNames[$index],
-                        'property_id' => $propertyId]);
-                    if (!$propertyValue) {
-                        $propertyValue = new PropertyValues();
-                        $propertyValue->value = $valueNames[$index];
-                        $propertyValue->property_id = $propertyId;
-                        $propertyValue->save();
-                    }
-                    $valueId = $propertyValue->id;
-
-                    $existingProductProperty = ProductProperties::findOne(
-                        [
-                            'product_id' => $productId,
-                            'property_id' => $propertyId,
-                            'value_id' => $valueId,
-                        ]
-                    );
-                    if (!$existingProductProperty) {
-                        $productProperty = new ProductProperties();
-                        $productProperty->product_id = $productId;
-                        $productProperty->property_id = $propertyId;
-                        $productProperty->value_id = $valueId;
-                        $productProperty->save();
-                    }
+        $categoryId = Categories::findOne(['name' => $categoryName])->id;
+        $existingProduct = Products::findOne(['name' => $name, 'price' => $price, 'category_id' => $categoryId]);
+        if ($existingProduct) {
+            return $this->render(
+                'save',
+                ['false' => 'Такой продукт уже существует', 'model' => $model]
+            );
+        } else {
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                $category = Categories::findOne(['name' => $categoryName]);
+                if (!$category) {
+                    $category = new Categories();
+                    $category->name = $categoryName;
+                    $category->save();
                 }
-            } else {
+
                 $product = new Products();
                 $product->name = $name;
                 $product->price = $price;
@@ -105,44 +79,168 @@ class AdminPanelController extends Controller
 
                 // Добавляем свойства и значения продукта
                 foreach ($propertyNames as $index => $propertyName) {
-                    $property = new Properties();
-                    $property->name = $propertyName;
-                    $property->category_id = $categoryId;
-                    $property->save();
+                    $property = Properties::findOne(['name' => $propertyName]);
+                    if (!$property) {
+                        $property = new Properties();
+                        $property->name = $propertyName;
+                        $property->save();
+                    }
+
                     $propertyId = $property->id;
+                    $propertyValue = PropertyValues::findOne([
+                        'value' => $valueNames[$index],
+                        'property_id' => $propertyId]);
+                    if (!$propertyValue) {
+                        $propertyValue = new PropertyValues();
+                        $propertyValue->value = $valueNames[$index];
+                        $propertyValue->property_id = $propertyId;
+                        $propertyValue->save();
+                    }
 
-                    $propertyValue = new PropertyValues();
-                    $propertyValue->value = $valueNames[$index];
-                    $propertyValue->property_id = $propertyId;
-                    $propertyValue->save();
                     $valueId = $propertyValue->id;
-
-                    $productProperty = new ProductProperties();
-                    $productProperty->product_id = $productId;
-                    $productProperty->property_id = $propertyId;
-                    $productProperty->value_id = $valueId;
-                    $productProperty->save();
+                    $productProperty = ProductProperties::findOne(
+                        [
+                            'category_id' => $categoryId,
+                            'product_id' => $productId,
+                            'property_id' => $propertyId,
+                            'value_id' => $valueId,
+                        ]
+                    );
+                    if (!$productProperty) {
+                        $productProperty = new ProductProperties();
+                        $productProperty->category_id = $categoryId;
+                        $productProperty->product_id = $productId;
+                        $productProperty->property_id = $propertyId;
+                        $productProperty->value_id = $valueId;
+                        $productProperty->save();
+                    }
                 }
+                $transaction->commit();
+                Yii::$app->session->setFlash('success', 'Товар добавлен или обновлен успешно.');
+
+                return $this->render(
+                    'save',
+                    ['success' => 'Товар успешно добавлен или обновлен', 'model' => $model]
+                );
+            } catch (Exception $e) {
+                $transaction->rollBack();
+                Yii::$app->session->setFlash(
+                    'error',
+                    'Произошла ошибка при добавлении или обновлении товара: ' . $e->getMessage()
+                );
+
+                return $this->render(
+                    'save',
+                    ['false' => 'Не удалось добавить товар', 'model' => $model]
+                );
+            }
+        }
+    }
+
+    /**
+     * Update action.
+     *
+     * @return string
+     */
+    public function actionUpdate(): string
+    {
+        $model = new AdminPanelForm();
+        $requestData = Yii::$app->request->post('AdminPanelForm');
+        $productId = $requestData['id'];
+        $name = $requestData['name'];
+        $price = $requestData['price'];
+        $categoryName = $requestData['category'];
+        $propertyNames = Yii::$app->request->post('property');
+        $valueNames = Yii::$app->request->post('value');
+
+        $convertedData = [
+            'id' => intval($productId),
+            'name' => $name,
+            'price' => intval($price),
+            'category' => $categoryName,
+            'property' => $propertyNames,
+            'value' => $valueNames,
+        ];
+
+        $product = Products::findOne(['id' => $productId]);
+        $category = $product->category;
+        $arrayProduct = $product->toArray();
+        unset($arrayProduct['category_id']);
+        $arrayProperties = [];
+        $arrayValues = [];
+        foreach ($product->productProperties as $productProperty) {
+            $arrayProperties[] = $productProperty->property->name;
+            $arrayValues[] = $productProperty->value->value;
+        }
+        $arrayProduct['category'] = $category->name;
+        $arrayProduct['property'] = $arrayProperties;
+        $arrayProduct['value'] = $arrayValues;
+
+        if ($convertedData === $arrayProduct) {
+            Yii::$app->session->setFlash('success', 'Вы ничего не изменили');
+
+            return $this->render(
+                'update',
+                ['success' => 'Вы ничего не изменили', 'model' => $model]
+            );
+        } else {
+            $category = Categories::findOne($convertedData['category']);
+            if (!$category) {
+                $category = new Categories();
+                $category->name = $convertedData['category'];
+                $category->save();
             }
 
-            $transaction->commit();
-            Yii::$app->session->setFlash('success', 'Товар добавлен или обновлен успешно.');
+            if ($arrayProduct['name'] !== $convertedData['name'] || $arrayProduct['price'] !== $convertedData['price']) {
+                $product->name = $convertedData['name'];
+                $product->price = $convertedData['price'];
+                $product->save();
+            }
+
+            if ($arrayProduct['property'] !== $convertedData['property'] || $arrayProduct['value'] !== $convertedData['value']) {
+                foreach ($propertyNames as $index => $propertyName) {
+                    $property = Properties::findOne(['name' => $propertyName]);
+                    if (!$property) {
+                        $property = new Properties();
+                        $property->name = $propertyName;
+                        $property->save();
+                    }
+
+                    $propertyId = $property->id;
+                    $propertyValue = PropertyValues::findOne([
+                        'value' => $valueNames[$index],
+                        'property_id' => $propertyId]);
+                    if (!$propertyValue) {
+                        $propertyValue = new PropertyValues();
+                        $propertyValue->value = $valueNames[$index];
+                        $propertyValue->property_id = $propertyId;
+                        $propertyValue->save();
+                    }
+
+                    $valueId = $propertyValue->id;
+                    $productProperty = ProductProperties::findOne(
+                        [
+                            'category_id' => $category->id,
+                            'product_id' => $productId,
+                            'property_id' => $propertyId,
+                            'value_id' => $valueId,
+                        ]
+                    );
+                    if (!$productProperty) {
+                        $productProperty = new ProductProperties();
+                        $productProperty->category_id = $category->id;
+                        $productProperty->product_id = $productId;
+                        $productProperty->property_id = $propertyId;
+                        $productProperty->value_id = $valueId;
+                        $productProperty->save();
+                    }
+                }
+            }
+            Yii::$app->session->setFlash('success', 'Товар успешно обновлен');
 
             return $this->render(
                 'update',
-                ['success' => 'Товар успешно добавлен или обновлен', 'model' => $model]
-            );
-        } catch (Exception $e) {
-            $transaction->rollBack();
-
-            Yii::$app->session->setFlash(
-                'error',
-                'Произошла ошибка при добавлении или обновлении товара: ' . $e->getMessage()
-            );
-
-            return $this->render(
-                'update',
-                ['false' => 'Не удалось добавить или обновить товар', 'model' => $model]
+                ['success' => 'Товар успешно обновлен', 'model' => $model]
             );
         }
     }

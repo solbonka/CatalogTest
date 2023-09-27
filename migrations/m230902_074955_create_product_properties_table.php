@@ -19,10 +19,28 @@ class m230902_074955_create_product_properties_table extends Migration
     {
         $this->createTable('{{%product_properties}}', [
             'id' => $this->primaryKey(),
+            'category_id' => $this->integer(),
             'product_id' => $this->integer(),
             'property_id' => $this->integer(),
             'value_id' => $this->integer(),
         ]);
+
+        // creates index for column `category_id`
+        $this->createIndex(
+            '{{%idx-product_properties-category_id}}',
+            '{{%product_properties}}',
+            'category_id'
+        );
+
+        // add foreign key for table `{{%category}}`
+        $this->addForeignKey(
+            '{{%fk-product_properties-category_id}}',
+            '{{%product_properties}}',
+            'category_id',
+            '{{%categories}}',
+            'id',
+            'CASCADE'
+        );
 
         // creates index for column `product_id`
         $this->createIndex(
@@ -81,6 +99,18 @@ class m230902_074955_create_product_properties_table extends Migration
      */
     public function safeDown()
     {
+        // drops foreign key for table `{{%category}}`
+        $this->dropForeignKey(
+            '{{%fk-product_properties-category_id}}',
+            '{{%product_properties}}',
+        );
+
+        // drops index for column `category_id`
+        $this->dropIndex(
+            '{{%idx-product_properties-category_id}}',
+            '{{%product_properties}}',
+        );
+
         // drops foreign key for table `{{%product}}`
         $this->dropForeignKey(
             '{{%fk-product_properties-product_id}}',

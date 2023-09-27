@@ -22,7 +22,7 @@ class AdminPanelForm extends Model
     {
         return [
             [['name', 'price', 'category'], 'required'],
-            ['price', 'number'],
+            ['price', 'double'],
             [['property', 'value'], 'safe'],
             ['property', 'required', 'message' => 'Хотя бы одно свойство должно быть задано'],
             ['value', 'required', 'message' => 'Хотя бы одно значение для свойства должно быть задано'],
