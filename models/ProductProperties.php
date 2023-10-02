@@ -31,11 +31,12 @@ class ProductProperties extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['category_id', 'product_id', 'property_id', 'value_id'], 'integer', 'unique'],
+            [['category_id', 'product_id', 'property_id', 'value_id'], 'integer'],
             [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Categories::class, 'targetAttribute' => ['category_id' => 'id']],
             [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Products::class, 'targetAttribute' => ['product_id' => 'id']],
             [['property_id'], 'exist', 'skipOnError' => true, 'targetClass' => Properties::class, 'targetAttribute' => ['property_id' => 'id']],
             [['value_id'], 'exist', 'skipOnError' => true, 'targetClass' => PropertyValues::class, 'targetAttribute' => ['value_id' => 'id']],
+            [['category_id', 'product_id', 'property_id', 'value_id'], 'unique', 'targetAttribute' => ['category_id', 'product_id', 'property_id', 'value_id']],
         ];
     }
 
